@@ -45,11 +45,6 @@ def stop_music():
         music_process.terminate()
         music_process.wait()
     
-        
-
-        
-    
-        
 def load_korean_font(size=20):
     font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
     return ImageFont.truetype(font_path, size)
@@ -63,35 +58,28 @@ def load_small_korean_font(size=12):
     return ImageFont.truetype(font_path, size)
 
 def is_button_pressed(button):
-    # 버튼이 눌린 상태인지 확인하는 도우미 함수
     return not button.value
 
 width = 240
 height = 240
 
-obstacle_coords = [
-  # 임의로 설정한 장애물 좌표, (left, top, right, bottom)
-    # 다른 장애물들의 좌표를 필요에 따라 추가하세요.
-]
+obstacle_coords = []
 
 obstacle_coords_top = []
 
+def is_collision(ball_x, ball_y, obstacle_coords):
+    ball_radius = 7.5  
+    ball_center = (ball_x + ball_radius, ball_y + ball_radius)  
 
     
-def is_collision(ball_x, ball_y, obstacle_coords):
-    ball_radius = 7.5  # 필요에 따라 반지름을 조절하세요
-    ball_center = (ball_x + ball_radius, ball_y + ball_radius)  # 원의 중심을 사용합니다
-
-    # 장애물과의 충돌을 확인합니다
     for obstacle_rect in obstacle_coords:
         if check_circle_collision(ball_center, ball_radius, obstacle_rect):
             print("충돌 발생:", ball_center, obstacle_rect)
-            return True  # 충돌이 감지되면 True를 반환합니다
+            return True  
 
-    return False  # 충돌이 없으면 False를 반환합니다
+    return False 
 
 def check_circle_collision(circle_center, circle_radius, rect):
-    # 원과 직사각형 간의 충돌을 확인합니다
     closest_x = max(rect[0], min(circle_center[0], rect[2]))
     closest_y = max(rect[1], min(circle_center[1], rect[3]))
 
@@ -103,27 +91,23 @@ def is_top_collision(ball_x, ball_y, obstacle_coords_top):
     ball_rect = (ball_x, ball_y, ball_x +15, ball_y + 15)
 
     for obstacle_rect in obstacle_coords_top:
-        # 위쪽면과의 충돌 여부만 확인
         if check_top_collision(ball_rect, obstacle_rect):
             return True
 
     return False
 
 def check_top_collision(rect1, rect2):
-    # 위쪽면과의 충돌 여부 확인 함수
     return rect1[2] >= rect2[0] and rect1[0] <= rect2[2] and rect1[3] >= rect2[1] and rect1[1] <= rect2[3]
-
 
 obstacle_coords = []
 obstacle_coords_top = []
 
 def map(draw, offset):
-    # 지오메트리 데쉬 스타일의 맵 생성
+    
     global obstacle_coords , obstacle_coords_top
-    obstacle_coords = []# 장애물 좌표를 저장할 리스트 추가
+    obstacle_coords = []
     rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), 1, 1))
     
-    # 첫 번째 장애물
     obstacle1_left = 250 + offset
     obstacle1_top = 200
     obstacle1_right = 370 + offset
@@ -136,7 +120,6 @@ def map(draw, offset):
     obstacle_coords.append((obstacle1_left, obstacle1_top+0.5, obstacle1_left+0.5, obstacle1_bottom))
     obstacle_coords_top.append((obstacle1_left, obstacle1_top, obstacle1_right, obstacle1_bottom))
 
-    # 두 번째 장애물
     obstacle2_left = 505 + offset
     obstacle2_top = 200
     obstacle2_right = 515 + offset
@@ -233,7 +216,6 @@ def map(draw, offset):
     obstacle_coords.append((obstacle9_left, obstacle9_top+0.5, obstacle9_left+0.5, obstacle9_bottom))
     obstacle_coords_top.append((obstacle9_left, obstacle9_top, obstacle9_right, obstacle9_bottom))
 
-    # 두 번째 장애물
     obstacle10_left = 1750 + offset
     obstacle10_top = 200
     obstacle10_right = 1760 + offset
@@ -330,7 +312,6 @@ def map(draw, offset):
     obstacle_coords.append((obstacle1_left, obstacle1_top+0.5, obstacle1_left+0.5, obstacle1_bottom+70))
     obstacle_coords_top.append((obstacle1_left, obstacle1_top, obstacle1_right, obstacle1_bottom+70))
 
-    # 두 번째 장애물
     obstacle2_left = 2760 + offset
     obstacle2_top = 170
     obstacle2_right = 2830 + offset
@@ -355,14 +336,11 @@ def map(draw, offset):
     obstacle_coords.append((obstacle3_left, obstacle3_top+0.5, obstacle3_left+0.5, obstacle3_bottom))
     obstacle_coords_top.append((obstacle3_left, obstacle3_top, obstacle3_right, obstacle3_bottom))
 
-
-
-
-    # 땅 생성
     ground_height = 20
     draw.rectangle((0, 240 - ground_height, width, height), outline="#000000", fill="#B8DEFF")
+    
+    return obstacle_coords, obstacle_coords_top 
 
-    return obstacle_coords, obstacle_coords_top  # 생성된 장애물 좌표를 반환
 
 def game_start(draw, button_U, button_D, button_L, button_R, button_C, button_A, button_B, fnt, korean_font, small_korean_font, mid_korean_font):
     global obstacle_coords, disp, image, obstacle_coords_top, obstacle_rect, ground_height
@@ -397,17 +375,17 @@ def game_start(draw, button_U, button_D, button_L, button_R, button_C, button_A,
     ball_x = 50
     ball_y = 150
     ball_velocity = 0
-    on_ground = True  # 초기에는 땅에 있음
+    on_ground = True  
 
     ground_height = 20
     obstacle_coords = []
 
     obstacle_coords, obstacle_coords_top = map(draw, offset)
 
-    is_paused = False  # 게임 일시 정지 여부를 나타내는 변수
+    is_paused = False 
 
     while True:
-        # 이미지 생성
+        
         image = Image.new("RGB", (width, height))
         draw = ImageDraw.Draw(image)
         
@@ -415,40 +393,33 @@ def game_start(draw, button_U, button_D, button_L, button_R, button_C, button_A,
 
         draw.rectangle((0, 0, width, height), outline="#000000", fill=rcolor)
 
-        obstacle_coords, obstacle_coords_top = map(draw, offset)  # 지오메트리 데쉬 스타일의 맵 생성
+        obstacle_coords, obstacle_coords_top = map(draw, offset)  
 
-        # 플레이어 대신 공을 그림
         draw.ellipse((ball_x, ball_y, ball_x + 15, ball_y + 15), outline="#000000", fill="#B8DEFF")
 
         disp.image(image)
 
-        # 플레이어의 입력 처리
         if is_button_pressed(button_A) and on_ground:
-            ball_velocity = -25.0  # 점프 속도를 높이기
-            on_ground = False  # 땅에서 벗어남
+            ball_velocity = -25.0  
+            on_ground = False  
 
-        # 중력에 따른 공의 움직임
         ball_velocity += 7.0
         ball_y += ball_velocity
 
-        # 땅 위에 있다면 땅으로 고정
         if ball_y > height - ground_height - 15:
             ball_y = height - ground_height - 15
             ball_velocity = 0
-            on_ground = True  # 땅에 닿음
+            on_ground = True 
 
         if is_button_pressed(button_B):
             if not is_paused:
                 pause_music()
                 is_paused = True
-                # 게임 일시 정지 화면을 표시하거나 추가적인 작업 수행
             else:
                 resume_music()
                 is_paused = False
-                # 게임 일시 정지 해제 화면을 표시하거나 추가적인 작업 수행
 
         if is_paused:
-            # 게임이 일시 정지된 상태에서 추가적인 작업 수행
             paused_time += time.time()
             time.sleep(0.01)
             continue
@@ -461,12 +432,10 @@ def game_start(draw, button_U, button_D, button_L, button_R, button_C, button_A,
             ground_height = obstacle_rect[3] - obstacle_rect[1]
         else:
             ground_height = 20
-        # 맵을 오른쪽으로 이동
         offset -= 15
         
         elapsed_time = time.time() - start_time - paused_time
         if elapsed_time > 19.5:
-            # Perform actions to switch to another screen or end the game
             game_fly(draw, button_U, button_D, button_L, button_R, button_C, button_A, button_B, fnt, korean_font, small_korean_font, mid_korean_font)
             break
 
@@ -475,13 +444,12 @@ def game_start(draw, button_U, button_D, button_L, button_R, button_C, button_A,
 
     obstacle_coords = [] 
     
-# 비행기 모양의 그림 함수
-def draw_geometry_dash_airplane(draw, x, y):
+
+def draw_airplane(draw, x, y):
     airplane_width = 20
     airplane_height = 10
     airplane_color = "#FFFFFF"
 
-    # 지오메트리 대쉬 스타일의 비행기를 그립니다.
     draw.polygon(
         [
             (x, y),
@@ -491,8 +459,6 @@ def draw_geometry_dash_airplane(draw, x, y):
         outline=airplane_color,
         fill=airplane_color,
     )
-
-# 나머지 코드는 이전과 동일하게 유지됩니다.
 
 
 
@@ -719,23 +685,21 @@ def game_fly(draw, button_U, button_D, button_L, button_R, button_C, button_A, b
     backlight = DigitalInOut(board.D26)
     backlight.switch_to_output()
     backlight.value = True
-    music_thread = threading.Thread(target=play_music, args=(music_file,))
 
     offset = 0
     ball_x = 50
     ball_y = 150
     ball_velocity = 0
-    on_ground = True  # 초기에는 땅에 있음
+    on_ground = True 
 
     ground_height = 20
     obstacle_coords = []
 
     obstacle_coords = fly_map(draw, offset)
 
-    is_paused = False  # 게임 일시 정지 여부를 나타내는 변수
+    is_paused = False 
 
     while True:
-        # 이미지 생성
         image = Image.new("RGB", (width, height))
         draw = ImageDraw.Draw(image)
 
@@ -743,13 +707,11 @@ def game_fly(draw, button_U, button_D, button_L, button_R, button_C, button_A, b
         draw.rectangle((0, 0, width, height), outline="#000000", fill=rcolor)
 
         obstacle_coords = fly_map(draw, offset)
-
-        # 플레이어 대신 지오메트리 대쉬 스타일의 비행기를 그립니다.
-        draw_geometry_dash_airplane(draw, ball_x, ball_y)
+        
+        draw_airplane(draw, ball_x, ball_y)
 
         disp.image(image)
 
-        # 플레이어의 입력 처리
         if is_button_pressed(button_U):
             ball_velocity = -25.0
             on_ground = True
@@ -863,7 +825,6 @@ def explain_joystick(draw, button_U, button_D, button_L, button_R, button_C, but
         A_fill = 0
         if not button_A.value:
             A_fill = button_fill
-            #play_music(music_file)
         draw.ellipse((140, 80, 180, 120), outline=button_outline, fill=A_fill)
         rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), 1, 1))
         draw.text((150, 82), "A", font=fnt, fill=rcolor)
@@ -916,8 +877,6 @@ def explain_button(draw, button_U, button_D, button_L, button_R, button_C, butto
         rst=reset_pin,
         baudrate=BAUDRATE,
     )
-    music_file = os.path.expanduser("~/project/노래 복사본.mp3")
-
     backlight = DigitalInOut(board.D26)
     backlight.switch_to_output()
     backlight.value = True
@@ -969,7 +928,6 @@ def explain_button(draw, button_U, button_D, button_L, button_R, button_C, butto
         A_fill = 0
         if not button_A.value:
             A_fill = button_fill
-            #play_music(music_file)
         draw.ellipse((140, 80, 180, 120), outline=button_outline, fill=A_fill)
         rcolor = tuple(int(x * 255) for x in hsv_to_rgb(random.random(), 1, 1))
         draw.text((150, 82), "A", font=fnt, fill=rcolor)
