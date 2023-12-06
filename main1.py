@@ -420,7 +420,7 @@ def game_start(draw, button_U, button_D, button_L, button_R, button_C, button_A,
                 is_paused = False
 
         if is_paused:
-            paused_time += time.time()
+            paused_time += 0.01
             time.sleep(0.01)
             continue
 
@@ -435,7 +435,7 @@ def game_start(draw, button_U, button_D, button_L, button_R, button_C, button_A,
         offset -= 15
         
         elapsed_time = time.time() - start_time - paused_time
-        if elapsed_time > 19.5:
+        if elapsed_time > 5:
             game_fly(draw, button_U, button_D, button_L, button_R, button_C, button_A, button_B, fnt, korean_font, small_korean_font, mid_korean_font)
             break
 
